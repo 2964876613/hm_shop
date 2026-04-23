@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:hm_shop/viewmodels--%E5%AD%98%E6%94%BE%E7%B1%BB%E5%9E%8B%E6%96%87%E4%BB%B6/home.dart';
 
 class HmSilder extends StatefulWidget {
-  final List<BannnerItem> bannerList;
+  final List<BannerItem> bannerList;
   HmSilder({Key? key,required this.bannerList}) : super(key: key);
 
   @override
