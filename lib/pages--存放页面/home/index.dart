@@ -15,6 +15,7 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView> {
+  SpecialOfferResult? _productOfferResult=SpecialOfferResult(id: "", title: "", subTypes: []);
   List<CategoryItem> _categoryList=[];
   List<BannerItem> _bannerList=[
     // BannerItem(
@@ -34,7 +35,7 @@ class _HomeViewState extends State<HomeView> {
       SliverToBoxAdapter(child: SizedBox(height: 10,),),
       SliverToBoxAdapter(child: Category(categoryList: _categoryList,),),
       SliverToBoxAdapter(child: SizedBox(height: 10,),),
-      SliverToBoxAdapter(child: Suggestion(),),
+      SliverToBoxAdapter(child: Suggestion(productOfferResult: _productOfferResult!,),),
       SliverToBoxAdapter(child: SizedBox(height: 10,),),
       SliverToBoxAdapter(child: Padding(padding: EdgeInsets.symmetric(horizontal: 10),
       child:Flex(
@@ -55,6 +56,7 @@ class _HomeViewState extends State<HomeView> {
     super.initState();
     _getBannderList();
     _getCategoryList();
+    _getProductList();
   }
   //获取banner列表
   void _getBannderList() async {
@@ -81,6 +83,29 @@ void _getCategoryList() async {
     print("❌ 分类请求失败，错误原因: $e");
   }
 }
+
+//获取特惠推荐列表
+ // 获取特惠推荐列表（带防崩溃保护）
+void _getProductList() async {
+  try {
+    // 1. 发起请求
+    var data = await getProductListAPI();
+    
+    // 2. 打印看看拿到了什么
+    print("✅ 特惠推荐请求成功，拿到的数据是: $data");
+    
+    // 3. 赋值并刷新 UI
+    if (data != null) {
+      _productOfferResult = data;
+      setState(() {});
+    }
+  } catch (e) {
+    // 4. 如果报错了，在这里拦截，不会导致程序卡死
+    print("❌ 特惠推荐请求失败，错误原因: $e");
+  }
+}
+
+
   @override
   Widget build(BuildContext context) {
     return CustomScrollView(slivers:_getHomeChildren() ,);
