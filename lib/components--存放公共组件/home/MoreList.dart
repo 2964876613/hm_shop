@@ -1,39 +1,104 @@
 import 'package:flutter/material.dart';
+import 'package:hm_shop/viewmodels--%E5%AD%98%E6%94%BE%E7%B1%BB%E5%9E%8B%E6%96%87%E4%BB%B6/home.dart';
 
 class MoreList extends StatefulWidget {
-  MoreList({Key? key}) : super(key: key);
+  // 推荐列表
+  final List<GoodsItem> recommendList;
+  const MoreList({Key? key, required this.recommendList}) : super(key: key);
 
   @override
   _MoreListState createState() => _MoreListState();
 }
 
 class _MoreListState extends State<MoreList> {
+  Widget _getChildren(int index) {
+    return Container(
+      child: Column(
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: AspectRatio(
+              aspectRatio: 1.0,
+              child: Image.network(
+                widget.recommendList[index].picture,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Image.asset(
+                    "lib/assets/home_cmd_inner.png",
+                    fit: BoxFit.cover,
+                  );
+                },
+              ),
+            ),
+          ),
+          SizedBox(height: 6),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 10),
+            child: Text(
+              widget.recommendList[index].name,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(color: Colors.black, fontSize: 20),
+            ),
+          ),
+          SizedBox(height: 6),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 10),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text.rich(
+                  TextSpan(
+                    text: "¥${widget.recommendList[index].price}",
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 20,
+                      fontWeight: FontWeight.w800,
+                    ),
+                    children: [
+                      TextSpan(text: " "),
+                      TextSpan(
+                        text: "${widget.recommendList[index].price}",
+                        style: TextStyle(
+                          decoration: TextDecoration.lineThrough,
+                          color: Colors.grey,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Text(
+                  "${widget.recommendList[index].orderNum}人付款",
+                  style: TextStyle(color: Colors.grey),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return SliverPadding(
-      // 给整个网格的左右加上 10 像素的边距（与上面的组件对齐）
-      padding: const EdgeInsets.symmetric(horizontal: 10), 
-      
-      // 2. sliver 属性里面放你的网格
-      sliver: SliverGrid.builder(
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          mainAxisSpacing: 10,
-          crossAxisSpacing: 10,
-          crossAxisCount: 2,
-        ),
-        itemBuilder: (context, index) {
-          // 3. 这里变得非常干净，直接返回 Container 即可
-          // 把之前那个包裹在外面、padding 为 0 的废代码删掉
-          return Container(
-            alignment: Alignment.center,
-            color: Colors.blue,
-            child: const Text(
-              "商品",
-              style: TextStyle(color: Colors.white, fontSize: 25),
-            ),
-          );
-        },
-      ),
+    // 必须是Sliver家族的组件
+    return SliverGrid.builder(
+      itemCount: widget.recommendList.length,
+      gridDelegate:
+          // 网格是两列
+          SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            mainAxisSpacing: 10,
+            crossAxisSpacing: 10,
+            childAspectRatio: 0.75,
+          ),
+      itemBuilder: (BuildContext context, int index) {
+        return Padding(
+          padding: EdgeInsets.symmetric(horizontal: 10),
+          child: _getChildren(index),
+        );
+      },
     );
   }
 }
