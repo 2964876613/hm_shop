@@ -15,7 +15,22 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView> {
-  SpecialOfferResult? _productOfferResult=SpecialOfferResult(id: "", title: "", subTypes: []);
+  // 热榜推荐
+  SpecialOfferResult? _inVogueResult = SpecialOfferResult(
+    id: "",
+    title: "",
+    subTypes: [],
+  );
+  // 一站式推荐
+  SpecialOfferResult? _oneStopResult = SpecialOfferResult(
+    id: "",
+    title: "",
+    subTypes: [],
+  );
+  SpecialOfferResult? _productOfferResult=SpecialOfferResult(
+    id: "",
+    title: "", 
+    subTypes: []);
   List<CategoryItem> _categoryList=[];
   List<BannerItem> _bannerList=[
     // BannerItem(
@@ -40,9 +55,14 @@ class _HomeViewState extends State<HomeView> {
       SliverToBoxAdapter(child: Padding(padding: EdgeInsets.symmetric(horizontal: 10),
       child:Flex(
         children: [
-          Expanded(child: Hot()),
-          SizedBox(width: 10,),
-          Expanded(child: Hot())
+          Expanded(
+                child: Hot(result: _inVogueResult!, type: "hot"),
+              ),
+              SizedBox(width: 10),
+              Expanded(
+                child: Hot(result: _oneStopResult!, type: "step"),
+              ),
+
         ],
         direction: Axis.horizontal), )
       ),
@@ -57,6 +77,8 @@ class _HomeViewState extends State<HomeView> {
     _getBannderList();
     _getCategoryList();
     _getProductList();
+    _getInVogueList();
+    _getOneStopList();
   }
   //获取banner列表
   void _getBannderList() async {
@@ -104,6 +126,19 @@ void _getProductList() async {
     print("❌ 特惠推荐请求失败，错误原因: $e");
   }
 }
+
+// 获取热榜推荐列表
+  void _getInVogueList() async {
+    _inVogueResult = await getInVogueListAPI();
+    setState(() {});
+  }
+
+  // 获取一站式推荐列表
+  void _getOneStopList() async {
+    _oneStopResult = await getOneStopListAPI();
+    setState(() {});
+  }
+
 
 
   @override
