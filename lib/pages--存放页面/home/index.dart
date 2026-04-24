@@ -15,6 +15,7 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView> {
+  List<CategoryItem> _categoryList=[];
   List<BannerItem> _bannerList=[
     // BannerItem(
     //   id: "1",
@@ -31,11 +32,11 @@ class _HomeViewState extends State<HomeView> {
     return [
       SliverToBoxAdapter(child: HmSilder(bannerList: _bannerList,),),
       SliverToBoxAdapter(child: SizedBox(height: 10,),),
-      SliverToBoxAdapter(child: Category(),),
+      SliverToBoxAdapter(child: Category(categoryList: _categoryList,),),
       SliverToBoxAdapter(child: SizedBox(height: 10,),),
       SliverToBoxAdapter(child: Suggestion(),),
       SliverToBoxAdapter(child: SizedBox(height: 10,),),
-      SliverToBoxAdapter(child: Padding(padding: EdgeInsetsGeometry.symmetric(horizontal: 10),
+      SliverToBoxAdapter(child: Padding(padding: EdgeInsets.symmetric(horizontal: 10),
       child:Flex(
         children: [
           Expanded(child: Hot()),
@@ -53,11 +54,33 @@ class _HomeViewState extends State<HomeView> {
     // TODO: implement initState
     super.initState();
     _getBannderList();
+    _getCategoryList();
   }
+  //获取banner列表
   void _getBannderList() async {
     _bannerList =await getBannerListAPI();
     setState(() {});
   }
+  //获取分类列表
+ // 获取分类列表（带防崩溃保护）
+void _getCategoryList() async {
+  try {
+    // 1. 发起请求
+    var data = await getCategoryListAPI();
+    
+    // 2. 打印看看拿到了什么
+    print("✅ 分类请求成功，拿到的数据是: $data");
+    
+    // 3. 赋值并刷新 UI
+    if (data != null) {
+      _categoryList = data;
+      setState(() {});
+    }
+  } catch (e) {
+    // 4. 如果报错了，在这里拦截，不会导致程序卡死
+    print("❌ 分类请求失败，错误原因: $e");
+  }
+}
   @override
   Widget build(BuildContext context) {
     return CustomScrollView(slivers:_getHomeChildren() ,);
