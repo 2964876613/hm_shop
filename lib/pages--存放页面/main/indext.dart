@@ -51,7 +51,7 @@ class _MainPageState extends State<MainPage> {
     });
   }
   List<Widget> _getChildren(){
-    return [HomeView(),CategoryView(),CartView(),MyView()];
+    return [HomeView(),CategoryView(),CartView(),MineView()];
   }
   @override
   Widget build(BuildContext context) {
