@@ -5,6 +5,7 @@ import 'package:hm_shop/components--%E5%AD%98%E6%94%BE%E5%85%AC%E5%85%B1%E7%BB%8
 import 'package:hm_shop/components--%E5%AD%98%E6%94%BE%E5%85%AC%E5%85%B1%E7%BB%84%E4%BB%B6/home/MoreList.dart';
 import 'package:hm_shop/components--%E5%AD%98%E6%94%BE%E5%85%AC%E5%85%B1%E7%BB%84%E4%BB%B6/home/Slider.dart';
 import 'package:hm_shop/components--%E5%AD%98%E6%94%BE%E5%85%AC%E5%85%B1%E7%BB%84%E4%BB%B6/home/Suggestion.dart';
+import 'package:hm_shop/utils--%E5%AD%98%E6%94%BE%E5%B7%A5%E5%85%B7%E7%B1%BB/toastUtls.dart';
 import 'package:hm_shop/viewmodels--%E5%AD%98%E6%94%BE%E7%B1%BB%E5%9E%8B%E6%96%87%E4%BB%B6/home.dart';
 
 class HomeView extends StatefulWidget {
@@ -76,14 +77,21 @@ class _HomeViewState extends State<HomeView> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    _getBannderList();
-    _getCategoryList();
-    _getProductList();
-    _getInVogueList();
-    _getOneStopList();
-    _getRecommendList();
+    // _getBannderList();
+    // _getCategoryList();
+    // _getProductList();
+    // _getInVogueList();
+    // _getOneStopList();
+    // _getRecommendList();
     _registerEvent();
+    Future.microtask((){
+      _key.currentState?.show();
+      _paddingTop=100;
+      setState(() {});
+    });
   }
+  //Future.micoTask
+
   //监听滚动到底部的事件
   void _registerEvent(){
     _controller.addListener((){
@@ -95,13 +103,12 @@ class _HomeViewState extends State<HomeView> {
   }
 
   //获取banner列表
-  void _getBannderList() async {
+  Future<void> _getBannderList() async {
     _bannerList =await getBannerListAPI();
-    setState(() {});
   }
   //获取分类列表
  // 获取分类列表（带防崩溃保护）
-void _getCategoryList() async {
+  Future<void> _getCategoryList() async {
   try {
     // 1. 发起请求
     var data = await getCategoryListAPI();
@@ -112,7 +119,6 @@ void _getCategoryList() async {
     // 3. 赋值并刷新 UI
     if (data != null) {
       _categoryList = data;
-      setState(() {});
     }
   } catch (e) {
     // 4. 如果报错了，在这里拦截，不会导致程序卡死
@@ -122,7 +128,7 @@ void _getCategoryList() async {
 
 //获取特惠推荐列表
  // 获取特惠推荐列表（带防崩溃保护）
-void _getProductList() async {
+Future<void> _getProductList() async {
   try {
     // 1. 发起请求
     var data = await getProductListAPI();
@@ -133,7 +139,6 @@ void _getProductList() async {
     // 3. 赋值并刷新 UI
     if (data != null) {
       _productOfferResult = data;
-      setState(() {});
     }
   } catch (e) {
     // 4. 如果报错了，在这里拦截，不会导致程序卡死
@@ -142,15 +147,13 @@ void _getProductList() async {
 }
 
 // 获取热榜推荐列表
-  void _getInVogueList() async {
+  Future<void> _getInVogueList() async {
     _inVogueResult = await getInVogueListAPI();
-    setState(() {});
   }
 
   // 获取一站式推荐列表
-  void _getOneStopList() async {
+  Future<void> _getOneStopList() async {
     _oneStopResult = await getOneStopListAPI();
-    setState(() {});
   }
   //页码
   int _page=1;
@@ -158,7 +161,7 @@ void _getProductList() async {
   bool _hasMore=true;//是否还有下一页
 
 // 获取推荐列表
-  void _getRecommendList() async {
+  Future<void> _getRecommendList() async {
     //当已经有请求正在加载 或者已经没有下一页 就放弃请求
     if(_isLoading||!_hasMore){
       return;
@@ -175,12 +178,38 @@ void _getProductList() async {
     _page++;
   }
 
- final ScrollController _controller=ScrollController();
+Future<void> _onRefresh()async{
+  _page=1;
+  _isLoading=false;
+  _hasMore=true;
+  await _getBannderList();
+  await _getCategoryList();
+  await _getProductList();
+  await _getInVogueList();
+  await _getOneStopList();
+  await _getRecommendList();
+  //数据获取成功 刷新成功了
+  ToastUtls.showToast(context,"刷新成功");
+  _paddingTop=0;
+  setState(() {});
+}
 
+ final ScrollController _controller=ScrollController();
+//GlobalKey是一个方法 可以创建一个key绑定到widget部件上 可以操作Widget部件
+final GlobalKey<RefreshIndicatorState> _key=GlobalKey<RefreshIndicatorState>();
+double _paddingTop=0;
   @override
   Widget build(BuildContext context) {
-    return CustomScrollView(
+     return RefreshIndicator(
+      key: _key,
+      onRefresh:_onRefresh,
+      child:AnimatedContainer(
+        padding: EdgeInsets.only(top: _paddingTop), 
+        duration: Duration(milliseconds: 300),
+       child:  CustomScrollView(
       controller: _controller ,//绑定控制器
-      slivers:_getHomeChildren() ,);
+      slivers:_getHomeChildren() ,)
+      )
+      );
   }
 }
