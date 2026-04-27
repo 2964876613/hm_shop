@@ -3,6 +3,7 @@ class GlobalConstens{
   static const String BASE_URL="https://meikou-api.itheima.net";
   static const int TIME_OUT=10;
   static const String SUCCESS_CODE="1";
+  static const String TOKEN_KEY="hm_shop_token";//token对应持久化的key
 }
 //请求地址接口的常量
 class HttpConstens{
@@ -15,4 +16,5 @@ class HttpConstens{
   static const String GUESS_LIST = "/home/goods/guessLike";//猜你喜欢
   static const String LOGIN="/login"; //登录请求地址
   //返回的结构体是GoodsItems类型 
+  static const String USER_PROFILE="/member/profile";
 }

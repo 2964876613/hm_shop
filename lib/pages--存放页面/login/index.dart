@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hm_shop/api--%E5%AD%98%E6%94%BE%E8%AF%B7%E6%B1%82/user.dart';
+import 'package:hm_shop/stores--%E5%AD%98%E6%94%BE%E5%85%A8%E5%B1%80%E7%8A%B6%E6%80%81%E7%BB%84%E4%BB%B6/TokenManager.dart';
 import 'package:hm_shop/stores--%E5%AD%98%E6%94%BE%E5%85%A8%E5%B1%80%E7%8A%B6%E6%80%81%E7%BB%84%E4%BB%B6/UserController.dart';
 import 'package:hm_shop/utils--%E5%AD%98%E6%94%BE%E5%B7%A5%E5%85%B7%E7%B1%BB/toastUtls.dart';
 
@@ -84,6 +85,7 @@ class _LoginPageState extends State<LoginPage> {
   });
   // print(res);//用户信息
   _userController.updateUserInfo(res);
+  tokenManager.setToken(res.token); //写入持久化数据
   ToastUtls.showToast(context, "登录成功");
   Navigator.pop(context);//返回上个页面
   } catch (e) {
