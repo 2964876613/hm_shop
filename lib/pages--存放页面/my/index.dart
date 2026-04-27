@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:hm_shop/api--%E5%AD%98%E6%94%BE%E8%AF%B7%E6%B1%82/mine.dart';
 import 'package:hm_shop/components--%E5%AD%98%E6%94%BE%E5%85%AC%E5%85%B1%E7%BB%84%E4%BB%B6/Mine/HmGuess.dart';
 import 'package:hm_shop/components--%E5%AD%98%E6%94%BE%E5%85%AC%E5%85%B1%E7%BB%84%E4%BB%B6/home/MoreList.dart';
+import 'package:hm_shop/stores--%E5%AD%98%E6%94%BE%E5%85%A8%E5%B1%80%E7%8A%B6%E6%80%81%E7%BB%84%E4%BB%B6/UserController.dart';
 import 'package:hm_shop/viewmodels--%E5%AD%98%E6%94%BE%E7%B1%BB%E5%9E%8B%E6%96%87%E4%BB%B6/home.dart';
 
 class MineView extends StatefulWidget {
@@ -12,6 +14,8 @@ class MineView extends StatefulWidget {
 }
 
 class _MineViewState extends State<MineView> {
+ final UserController _userController = Get.put(UserController());
+
   Widget _buildHeader() {
     return Container(
       decoration: BoxDecoration(
@@ -24,25 +28,39 @@ class _MineViewState extends State<MineView> {
       padding: const EdgeInsets.only(left: 20, right: 40, top: 80, bottom: 20),
       child: Row(
         children: [
-          CircleAvatar(
+          Obx((){
+            return CircleAvatar(
             radius: 26,
-            backgroundImage: const AssetImage('lib/assets--存放资源/goods_avatar.png'),
+            backgroundImage: 
+            _userController.user.value.avatar.isNotEmpty
+            ? NetworkImage(_userController.user.value.avatar)
+            : AssetImage('lib/assets--存放资源/goods_avatar.png'),
             backgroundColor: Colors.white,
-          ),
+          );
+          }),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                GestureDetector(
+                Obx((){
+                  //Obx中必须得有可检测的响应式数据
+                  return  GestureDetector(
                   onTap:(){
-                    Navigator.pushNamed(context, "/login");
+                    if(_userController.user.value.id.isEmpty)
+                    {
+                      //当没有用户信息时，可以去登录
+                      Navigator.pushNamed(context, "/login");
+                    }
                   },
                   child: Text(
-                  '立即登录',
+                   _userController.user.value.id.isNotEmpty
+                   ? _userController.user.value.account
+                   :'立即登录',//有登录信息 显示用户信息 否则显示立即登录
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
                 ),
-                )
+                );
+                })
               ],
             ),
           ),
