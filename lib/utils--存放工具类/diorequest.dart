@@ -1,4 +1,4 @@
-//基于Dio进行1二次封装
+//基于Dio进行二次封装
 import 'package:dio/dio.dart';
 import 'package:hm_shop/constants--%E5%AD%98%E6%94%BE%E5%B8%B8%E9%87%8F%E6%96%87%E4%BB%B6/index.dart';
 
@@ -10,6 +10,7 @@ class DioRequest {
       ..connectTimeout=Duration(seconds: GlobalConstens.TIME_OUT)
       ..sendTimeout=Duration(seconds: GlobalConstens.TIME_OUT)
       ..receiveTimeout=Duration(seconds: GlobalConstens.TIME_OUT);
+      _appInterceptor();
   }
   //拦截器
   void _appInterceptor(){
@@ -26,13 +27,21 @@ class DioRequest {
         handler.reject(DioException(requestOptions: response.requestOptions));
       },
       onError: (error, handler) {
-        handler.reject(error);
+        // handler.reject(error);
+        handler.reject(
+          DioException(
+            requestOptions: error.requestOptions,
+            message: error.response?.data["msg"]??""));
       },
     ));
   }
 
   Future<dynamic> get(String url,{Map<String,dynamic>? params}){
     return  _handleResponse(_dio.get(url,queryParameters: params) );
+  }
+  //定义post接口
+  Future<dynamic> post(String url,{Map<String,dynamic>?data}){
+    return _handleResponse(_dio.post(url,data: data));
   }
   //进一步处理返回结果的函数
   Future<dynamic> _handleResponse(Future<Response<dynamic>> task) async{
@@ -44,9 +53,13 @@ class DioRequest {
       return data["result"];//只要result结果
     }
     //抛出异常
-    throw Exception(data["msg"]??"加载数据异常");
+    // throw Exception(data["msg"]??"加载数据异常");
+    throw DioException(
+      requestOptions: res.requestOptions,
+      message: data["msg"]??"加载数据失败");
     } catch (e) {
-      throw Exception(e); 
+      // throw Exception(e); 
+      rethrow; //不改变原来抛出的异常类型
     }
   }
 }
